@@ -3,10 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Management and Productivity App</title>
+    <title>Interactive Calendar</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .calendar { width: 300px; margin: 20px auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day { border: 1px solid #ccc; padding: 10px; cursor: pointer; min-height: 50px; }
+        .event-input { display: none; position: absolute; background: white; border: 1px solid #000; padding: 5px; }
+    </style>
 </head>
 <body>
-<h1>Calendar </h1>
+    <div class="calendar">
+        <div class="header">
+            <button onclick="prevMonth()">◀</button>
+            <h2 id="month-year"></h2>
+            <button onclick="nextMonth()">▶</button>
+        </div>
+        <div class="days" id="calendar-days"></div>
+    </div>
+    <div class="event-input" id="event-input">
+        <input type="text" id="event-text" placeholder="Enter event">
+        <button onclick="saveEvent()">Save</button>
+    </div>
+    
+    <script>
+        let date = new Date();
+        let events = {}; // Store events
+        const monthYear = document.getElementById('month-year');
+        const calendarDays = document.getElementById('calendar-days');
+        const eventInput = document.getElementById('event-input');
+        const eventText = document.getElementById('event-text');
+        let activeDay = null;
 
+        function renderCalendar() {
+            calendarDays.innerHTML = '';
+            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+            const lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+            monthYear.textContent = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            for (let i = 0; i < firstDay; i++) {
+                calendarDays.innerHTML += '<div></div>';
+            }
+            
+            for (let day = 1; day <= lastDate; day++) {
+                let dayDiv = document.createElement('div');
+                dayDiv.classList.add('day');
+                dayDiv.textContent = day;
+                dayDiv.onclick = () => openEventInput(day);
+                if (events[`${date.getFullYear()}-${date.getMonth()}-${day}`]) {
+                    dayDiv.style.backgroundColor = '#ffff99';
+                }
+                calendarDays.appendChild(dayDiv);
+            }
+        }
+
+        function openEventInput(day) {
+            activeDay = `${date.getFullYear()}-${date.getMonth()}-${day}`;
+            eventInput.style.display = 'block';
+            eventInput.style.top = event.clientY + 'px';
+            eventInput.style.left = event.clientX + 'px';
+            eventText.value = events[activeDay] || '';
+        }
+
+        function saveEvent() {
+            if (activeDay) {
+                events[activeDay] = eventText.value;
+                eventInput.style.display = 'none';
+                renderCalendar();
+            }
+        }
+
+        function prevMonth() {
+            date.setMonth(date.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            date.setMonth(date.getMonth() + 1);
+            renderCalendar();
+        }
+
+        renderCalendar();
+    </script>
 </body>
 </html>
