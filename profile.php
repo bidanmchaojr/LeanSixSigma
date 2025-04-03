@@ -49,14 +49,14 @@
         <div class="banner-item2">
             <span class="banner-title">To-Do List Application</span><br>
             <span class="banner-text">Welcome, <?=$user->firstname." ".$user->lastname?></span><br><br>
-            <!-- <span class="banner-text2">menu ::</span>&nbsp;&nbsp;  <a href="index.html" class="banner-link">Calendar </a> <span class="banner-text2">|</span> <a href="profile.php?action=logout" class="banner-link2">logout</a> 
-              -->
-              <ul>
+            <span class="banner-text2">menu ::</span>&nbsp;&nbsp;  <a href="calendar.php" class="banner-link"> Calendar </a> <span class="banner-text2">|</span> <a href="profile.php?action=logout" class="banner-link2">logout</a> 
+             
+              <!-- <ul>
             <li><a href="default.asp">Home</a></li>
             <li><a href="news.asp">News</a></li>
             <li><a href="contact.asp">Contact</a></li>
             <li><a href="about.asp">About</a></li>
-            </ul>
+            </ul> -->
 
         </div>
     </div>
