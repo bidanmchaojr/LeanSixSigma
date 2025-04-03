@@ -43,7 +43,73 @@ $firstDayOfWeek = $firstDay->format('w');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Calendar</title>
     <style>
-        /* Same CSS as before */
+                body { 
+            font-family: Arial, sans-serif; 
+            text-align: center;
+            background-color: #f7f7f7; 
+            color: rgb(0, 0, 0);
+        }
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background: linear-gradient(to bottom, #FF99CC, #FC73FF);
+            padding: 40px 10px 20px 10px;
+            border-radius: 0 0 50% 50%;
+            margin-bottom: 40px;
+            position: relative;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        .nav a {
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .calendar {
+            width: 80%; 
+            max-width: 1000px;
+            margin: 20px auto; 
+            background: linear-gradient(to bottom, #f1f1f1, #ebebeb);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+        .header { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 20px;
+        }
+        .days { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 10px; 
+        }
+        .day { 
+            border: 1px solid #ccc; 
+            padding: 20px; 
+            cursor: pointer; 
+            min-height: 80px; 
+            background-color: #f7f7f7;
+            color: rgb(0, 0, 0);
+            font-size: 18px;
+            position: relative;
+        }
+        .has-task {
+            background-color: #ffff99 !important;
+        }
+        .goal-popup, .event-popup { 
+            display: none; 
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
