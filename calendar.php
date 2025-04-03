@@ -34,6 +34,11 @@ $lastDay->modify('last day of this month');
 
 $daysInMonth = $lastDay->format('d');
 $firstDayOfWeek = $firstDay->format('w');
+
+// Determine if current date is before January 2025
+$minYear = 2025;
+$minMonth = 1;
+$canGoBack = ($year > $minYear) || ($year == $minYear && $month > $minMonth);
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +48,7 @@ $firstDayOfWeek = $firstDay->format('w');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Calendar</title>
     <style>
-                body { 
+        body { 
             font-family: Arial, sans-serif; 
             text-align: center;
             background-color: #f7f7f7; 
@@ -119,14 +124,16 @@ $firstDayOfWeek = $firstDay->format('w');
     </div>
     <div class="calendar">
         <div class="header">
-            <button onclick="window.location='?month=<?php echo $month - 1; ?>&year=<?php echo $year; ?>'">◀</button>
+            <!-- Left Arrow Button (◀) -->
+            <button onclick="window.location='<?php echo $canGoBack ? '?month=' . ($month - 1) . '&year=' . ($month == 1 ? $year - 1 : $year) : '#'; ?>'" <?php echo !$canGoBack ? 'disabled' : ''; ?>>◀</button>
             <h2><?php echo $monthName; ?></h2>
             <select id="year-select" onchange="window.location='?month=<?php echo $month; ?>&year=' + this.value">
                 <?php for ($i = 2025; $i <= date('Y') + 10; $i++) : ?>
                     <option value="<?php echo $i; ?>" <?php echo $i == $year ? 'selected' : ''; ?>><?php echo $i; ?></option>
                 <?php endfor; ?>
             </select>
-            <button onclick="window.location='?month=<?php echo $month + 1; ?>&year=<?php echo $year; ?>'">▶</button>
+            <!-- Right Arrow Button (▶) -->
+            <button onclick="window.location='<?php echo '?month=' . ($month + 1) . '&year=' . ($month == 12 ? $year + 1 : $year); ?>'">▶</button>
         </div>
         <div class="days" id="calendar-days">
             <?php
@@ -142,7 +149,7 @@ $firstDayOfWeek = $firstDay->format('w');
                 $eventText = $hasEvent ? $_SESSION['events'][$currentDay] : '';
                 echo '<div class="day" onclick="openEventPopup(\'' . $currentDay . '\')">
                         ' . $day . 
-                        ($hasEvent ? '<div class="has-task">Task</div>' : '') .
+                        ($hasEvent ? '<div class="has-task">Task</div>' : '') . 
                     '</div>';
             }
             ?>
