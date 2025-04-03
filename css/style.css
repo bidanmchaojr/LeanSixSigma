@@ -7,6 +7,7 @@ body{
     flex-direction: row;
     background-color: rgb(231, 236, 213);
     width: 100%;
+    text-align: center;
 }
 .banner-item1{
     padding: 2px;
@@ -20,7 +21,7 @@ body{
     border: 0px solid rgb(231, 236, 213);
     margin: 0px;
     font-size: 14pt;
-    text-align: right;
+    text-align: left;
     width: 80%;
 }
 .banner-title{
@@ -36,12 +37,12 @@ body{
 .banner-text2{
     font-family:'Times New Roman', Times, serif;
     font-size: 12pt;
-    color: rgb(116, 136, 238);
+    color: #000000;
 }
 .newtask-text{
     font-family: 'Times New Roman', Times, serif;
     font-size: 16pt;
-    color: rgb(116, 136, 238);
+    color: #000000;
     font-weight: bold; 
 }
 .newtask-text2{
@@ -52,13 +53,13 @@ body{
 .newtask-link{
     font-family: 'Times New Roman', Times, serif;
     font-size: 16pt;
-    color: rgb(231, 236, 213);
+    color: #000000;
     text-decoration: none;
 }
 .newtask-link:hover{
     font-family: 'Times New Roman', Times, serif;
     font-size: 16pt;
-    color: rgb(153, 162, 204);
+    color: rgb(0, 0, 0);
     text-decoration: none;
 }
 .banner-link{
