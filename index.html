@@ -20,28 +20,27 @@
             border-radius: 0 0 50% 50%;
             margin-bottom: 40px;
             position: relative;
-            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3); /* Drop shadow under the header */
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
         }
         .nav a {
             color: rgb(0, 0, 0);
             text-decoration: none;
             font-size: 18px;
-            position: relative;
-            z-index: 2;
         }
         .calendar {
             width: 80%; 
             max-width: 1000px;
             margin: 20px auto; 
-            background: linear-gradient(to bottom, #FF99CC, #FC73FF);
+            background: linear-gradient(to bottom, #f1f1f1, #ebebeb);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
         }
         .header { 
             display: flex; 
-            justify-content: space-between; 
+            justify-content: center; 
             align-items: center; 
+            gap: 20px;
         }
         .days { 
             display: grid; 
@@ -53,16 +52,25 @@
             padding: 20px; 
             cursor: pointer; 
             min-height: 80px; 
-            background-color: #f7f7f7; /* Updated to requested color */
+            background-color: #f7f7f7;
             color: rgb(0, 0, 0);
             font-size: 18px;
+            position: relative;
         }
-        .event-input { 
+        .has-task {
+            background-color: #ffff99 !important;
+        }
+        .goal-popup, .event-popup { 
             display: none; 
-            position: absolute; 
-            background: white; 
-            border: 1px solid #000; 
-            padding: 10px; 
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -73,32 +81,60 @@
     </div>
     <div class="calendar">
         <div class="header">
-            <button onclick="prevMonth()">◀</button>
+            <button onclick="prevMonth()" id="prev-btn">◀</button>
             <h2 id="month-year"></h2>
+            <select id="year-select" onchange="changeYear(this.value)"></select>
             <button onclick="nextMonth()">▶</button>
         </div>
         <div class="days" id="calendar-days"></div>
     </div>
-    <div class="event-input" id="event-input">
-        <input type="text" id="event-text" placeholder="Enter event">
-        <button onclick="saveEvent()">Save</button>
-        <button onclick="closeEventInput()">Close</button>
-    </div>
     
+    <div class="goal-popup" id="goal-popup">
+        <p>Would you like to set a goal?</p>
+        <input type="text" id="goal-text" placeholder="Enter goal">
+        <input type="date" id="goal-date">
+        <button onclick="saveGoal()">Save Goal</button>
+        <button onclick="closeGoalPopup()">No</button>
+    </div>
+
+    <div class="event-popup" id="event-popup">
+        <p id="event-details"></p>
+        <input type="text" id="task-text" placeholder="Enter task">
+        <button onclick="saveTask()">Save Task</button>
+        <button onclick="closeEventPopup()">Close</button>
+    </div>
+
     <script>
         let date = new Date();
-        let events = {}; // Store events
+        let events = {}; 
+        let activeDay = null;
         const monthYear = document.getElementById('month-year');
         const calendarDays = document.getElementById('calendar-days');
-        const eventInput = document.getElementById('event-input');
-        const eventText = document.getElementById('event-text');
-        let activeDay = null;
+        const yearSelect = document.getElementById('year-select');
+        const prevBtn = document.getElementById('prev-btn');
+        const eventPopup = document.getElementById('event-popup');
+        const taskText = document.getElementById('task-text');
+        const today = new Date();
+
+        function populateYearOptions() {
+            const startYear = 2025;
+            const currentYear = today.getFullYear();
+            for (let i = startYear; i <= currentYear + 10; i++) {
+                let option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                if (i === date.getFullYear()) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+        }
 
         function renderCalendar() {
             calendarDays.innerHTML = '';
             const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
             const lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
             monthYear.textContent = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            yearSelect.value = date.getFullYear();
+            prevBtn.disabled = date.getFullYear() === 2025 && date.getMonth() === 0;
             
             for (let i = 0; i < firstDay; i++) {
                 calendarDays.innerHTML += '<div></div>';
@@ -108,45 +144,36 @@
                 let dayDiv = document.createElement('div');
                 dayDiv.classList.add('day');
                 dayDiv.textContent = day;
-                dayDiv.onclick = () => openEventInput(day);
-                if (events[`${date.getFullYear()}-${date.getMonth()}-${day}`]) {
-                    dayDiv.style.backgroundColor = '#ffff99';
-                    dayDiv.style.color = '#000';
+                dayDiv.onclick = () => openEventPopup(day);
+                let key = `${date.getFullYear()}-${date.getMonth()}-${day}`;
+                if (events[key]) {
+                    dayDiv.classList.add('has-task');
                 }
                 calendarDays.appendChild(dayDiv);
             }
         }
 
-        function openEventInput(day) {
+        function openEventPopup(day) {
             activeDay = `${date.getFullYear()}-${date.getMonth()}-${day}`;
-            eventInput.style.display = 'block';
-            eventInput.style.top = event.clientY + 'px';
-            eventInput.style.left = event.clientX + 'px';
-            eventText.value = events[activeDay] || '';
+            eventPopup.style.display = 'block';
+            document.getElementById('event-details').textContent = `Tasks for ${day} ${monthYear.textContent}`;
+            taskText.value = events[activeDay] || '';
         }
 
-        function saveEvent() {
+        function saveTask() {
             if (activeDay) {
-                events[activeDay] = eventText.value;
-                eventInput.style.display = 'none';
+                events[activeDay] = taskText.value;
+                taskText.value = '';
+                eventPopup.style.display = 'none';
                 renderCalendar();
             }
         }
 
-        function closeEventInput() {
-            eventInput.style.display = 'none';
+        function closeEventPopup() {
+            eventPopup.style.display = 'none';
         }
 
-        function prevMonth() {
-            date.setMonth(date.getMonth() - 1);
-            renderCalendar();
-        }
-
-        function nextMonth() {
-            date.setMonth(date.getMonth() + 1);
-            renderCalendar();
-        }
-
+        populateYearOptions();
         renderCalendar();
     </script>
 </body>
